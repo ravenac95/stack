@@ -14,14 +14,12 @@ variable "environment" {
   description = "Environment tag, e.g prod"
 }
 
-variable "availability_zones" {
-  description = "Comma separated list of availability zones"
-}
-
 variable "name" {
   description = "Name tag, e.g stack"
   default     = "stack"
 }
+
+data "aws_availability_zones" "availability_zones" {}
 
 /**
  * VPC
@@ -70,7 +68,7 @@ resource "aws_eip" "nat" {
 resource "aws_subnet" "internal" {
   vpc_id            = "${aws_vpc.main.id}"
   cidr_block        = "${element(split(",", var.internal_subnets), count.index)}"
-  availability_zone = "${element(split(",", var.availability_zones), count.index)}"
+  availability_zone = "${element(data.aws_availability_zones.availability_zones, count.index)}"
   count             = "${length(compact(split(",", var.internal_subnets)))}"
 
   tags {
@@ -81,7 +79,7 @@ resource "aws_subnet" "internal" {
 resource "aws_subnet" "external" {
   vpc_id                  = "${aws_vpc.main.id}"
   cidr_block              = "${element(split(",", var.external_subnets), count.index)}"
-  availability_zone       = "${element(split(",", var.availability_zones), count.index)}"
+  availability_zone       = "${element(data.aws_availability_zones.availability_zones, count.index)}"
   count                   = "${length(compact(split(",", var.external_subnets)))}"
   map_public_ip_on_launch = true
 
