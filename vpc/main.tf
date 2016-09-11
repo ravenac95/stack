@@ -68,7 +68,7 @@ resource "aws_eip" "nat" {
 resource "aws_subnet" "internal" {
   vpc_id            = "${aws_vpc.main.id}"
   cidr_block        = "${element(split(",", var.internal_subnets), count.index)}"
-  availability_zone = "${element(data.aws_availability_zones.availability_zones, count.index)}"
+  availability_zone = "${element(data.aws_availability_zones.availability_zones.names, count.index)}"
   count             = "${length(compact(split(",", var.internal_subnets)))}"
 
   tags {
@@ -79,7 +79,7 @@ resource "aws_subnet" "internal" {
 resource "aws_subnet" "external" {
   vpc_id                  = "${aws_vpc.main.id}"
   cidr_block              = "${element(split(",", var.external_subnets), count.index)}"
-  availability_zone       = "${element(data.aws_availability_zones.availability_zones, count.index)}"
+  availability_zone       = "${element(data.aws_availability_zones.availability_zones.names, count.index)}"
   count                   = "${length(compact(split(",", var.external_subnets)))}"
   map_public_ip_on_launch = true
 
